@@ -3,24 +3,569 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HelloWorld Test Page</title>
+  <title>Vercel Connect Dashboard</title>
   <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f9fafb;
+      --text: #121212;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #000000;
+      --accent-soft: #f0f0f0;
+      --success: #047857;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0, 0, 0, 0.08), transparent 32rem),
+        linear-gradient(145deg, #ffffff 0%, var(--bg) 48%, #eef2ff 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(229, 231, 235, 0.9);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-copy {
+      padding: 44px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 5px rgba(4, 120, 87, 0.12);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(2.45rem, 6vw, 5.3rem);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .actions {
       display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background-color: #f5f5f5;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--accent);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
     }
-    h1 {
-      color: #333;
-      font-size: 3rem;
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+    }
+
+    .button.secondary {
+      color: var(--text);
+      background: transparent;
+      border-color: var(--border);
+    }
+
+    .status-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 26px;
+      min-height: 100%;
+    }
+
+    .status-label {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status-value {
+      margin: 12px 0;
+      font-size: 2rem;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+    }
+
+    .status-message {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .config {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface-soft);
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text);
+      background: #ffffff;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #111827;
+      box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.08);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .metric {
+      grid-column: span 4;
+      padding: 24px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 2.35rem;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .section {
+      grid-column: span 6;
+      padding: 26px;
+    }
+
+    .section.full {
+      grid-column: 1 / -1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--accent-soft);
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .item {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #ffffff;
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .item-title {
+      margin: 0;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .item-meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .state {
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .state.ready {
+      background: #ecfdf5;
+      color: var(--success);
+    }
+
+    .state.error,
+    .state.canceled {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .state.building,
+    .state.queued,
+    .state.initializing {
+      background: #fffbeb;
+      color: var(--warning);
+    }
+
+    .empty {
+      margin: 0;
+      padding: 18px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.65);
+      line-height: 1.65;
+    }
+
+    .code {
+      overflow-x: auto;
+      margin: 0;
+      padding: 16px;
+      border-radius: 18px;
+      color: #e5e7eb;
+      background: #111827;
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 880px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric,
+      .section {
+        grid-column: 1 / -1;
+      }
+
+      .hero-copy {
+        padding: 30px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>HelloWorld</h1>
+  <main class="shell">
+    <section class="hero">
+      <div class="panel hero-copy">
+        <p class="eyebrow"><span class="pulse"></span> Vercel REST API 連携</p>
+        <h1>Vercelのプロジェクトとデプロイ状況を一画面で確認。</h1>
+        <p class="lead">
+          VercelのServerless Function経由でREST APIに接続し、認証ユーザー、プロジェクト、最新デプロイを取得する軽量ダッシュボードです。
+          APIトークンはフロントエンドへ露出せず、Vercelの環境変数で管理します。
+        </p>
+        <div class="actions">
+          <button class="button" id="refreshButton" type="button">Vercelから再取得</button>
+          <a class="button secondary" href="https://vercel.com/account/tokens" target="_blank" rel="noreferrer">APIトークンを作成</a>
+        </div>
+      </div>
+
+      <aside class="panel status-card" aria-live="polite">
+        <div>
+          <span class="status-label">Connection</span>
+          <div class="status-value" id="connectionTitle">接続待機中</div>
+          <p class="status-message" id="connectionMessage">「Vercelから再取得」を押すと、/api/vercel を呼び出します。</p>
+        </div>
+        <form class="config" id="configForm">
+          <label>
+            Team ID（任意）
+            <input id="teamIdInput" name="teamId" placeholder="team_xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+          </label>
+          <button class="button secondary" type="submit">Team IDを反映</button>
+        </form>
+      </aside>
+    </section>
+
+    <section class="grid" aria-label="Vercel summary">
+      <article class="panel metric">
+        <span class="status-label">Projects</span>
+        <strong id="projectCount">—</strong>
+      </article>
+      <article class="panel metric">
+        <span class="status-label">Deployments</span>
+        <strong id="deploymentCount">—</strong>
+      </article>
+      <article class="panel metric">
+        <span class="status-label">Account</span>
+        <strong id="accountName">—</strong>
+      </article>
+
+      <article class="panel section">
+        <div class="section-header">
+          <h2>プロジェクト</h2>
+          <span class="badge">最新6件</span>
+        </div>
+        <div class="list" id="projectsList"></div>
+      </article>
+
+      <article class="panel section">
+        <div class="section-header">
+          <h2>デプロイ</h2>
+          <span class="badge">最新8件</span>
+        </div>
+        <div class="list" id="deploymentsList"></div>
+      </article>
+
+      <article class="panel section full">
+        <div class="section-header">
+          <h2>セットアップ</h2>
+          <span class="badge">Vercel環境変数</span>
+        </div>
+        <pre class="code"><code>vercel env add VERCEL_API_TOKEN
+# Team単位で取得したい場合だけ設定
+vercel env add VERCEL_TEAM_ID
+vercel deploy --prod</code></pre>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const elements = {
+      refreshButton: document.querySelector('#refreshButton'),
+      configForm: document.querySelector('#configForm'),
+      teamIdInput: document.querySelector('#teamIdInput'),
+      connectionTitle: document.querySelector('#connectionTitle'),
+      connectionMessage: document.querySelector('#connectionMessage'),
+      projectCount: document.querySelector('#projectCount'),
+      deploymentCount: document.querySelector('#deploymentCount'),
+      accountName: document.querySelector('#accountName'),
+      projectsList: document.querySelector('#projectsList'),
+      deploymentsList: document.querySelector('#deploymentsList'),
+    };
+
+    const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+
+    function setConnection(title, message) {
+      elements.connectionTitle.textContent = title;
+      elements.connectionMessage.textContent = message;
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return '日時不明';
+      const date = new Date(typeof timestamp === 'number' ? timestamp : String(timestamp));
+      if (Number.isNaN(date.getTime())) return '日時不明';
+      return dateFormatter.format(date);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('\"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function stateClass(state) {
+      return String(state || 'unknown').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    }
+
+    function renderEmpty(target, message) {
+      target.innerHTML = `<p class="empty">${escapeHtml(message)}</p>`;
+    }
+
+    function renderProjects(projects) {
+      elements.projectCount.textContent = projects.length;
+
+      if (!projects.length) {
+        renderEmpty(elements.projectsList, '表示できるプロジェクトがありません。');
+        return;
+      }
+
+      elements.projectsList.innerHTML = projects.map((project) => `
+        <article class="item">
+          <div class="item-top">
+            <p class="item-title">${escapeHtml(project.name || 'Untitled project')}</p>
+            <span class="state">${escapeHtml(project.framework || 'other')}</span>
+          </div>
+          <p class="item-meta">Project ID: ${escapeHtml(project.id || 'unknown')}</p>
+          <p class="item-meta">Updated: ${formatDate(project.updatedAt)}</p>
+        </article>
+      `).join('');
+    }
+
+    function renderDeployments(deployments) {
+      elements.deploymentCount.textContent = deployments.length;
+
+      if (!deployments.length) {
+        renderEmpty(elements.deploymentsList, '表示できるデプロイがありません。');
+        return;
+      }
+
+      elements.deploymentsList.innerHTML = deployments.map((deployment) => `
+        <article class="item">
+          <div class="item-top">
+            <p class="item-title">${escapeHtml(deployment.name || 'Untitled deployment')}</p>
+            <span class="state ${stateClass(deployment.state)}">${escapeHtml(deployment.state || 'unknown')}</span>
+          </div>
+          <p class="item-meta">Target: ${escapeHtml(deployment.target || 'unknown')} / Creator: ${escapeHtml(deployment.creator || 'unknown')}</p>
+          <p class="item-meta">Created: ${formatDate(deployment.createdAt)}</p>
+          ${deployment.url ? `<a class="item-meta" href="${escapeHtml(deployment.url)}" target="_blank" rel="noreferrer">${escapeHtml(deployment.url)}</a>` : ''}
+        </article>
+      `).join('');
+    }
+
+    async function loadVercelData() {
+      const params = new URLSearchParams();
+      const teamId = elements.teamIdInput.value.trim();
+      if (teamId) params.set('teamId', teamId);
+
+      elements.refreshButton.disabled = true;
+      setConnection('取得中…', 'Vercel APIからデータを取得しています。');
+
+      try {
+        const response = await fetch(`/api/vercel${params.toString() ? `?${params}` : ''}`);
+        const payload = await response.json();
+
+        if (!response.ok || !payload.connected) {
+          throw new Error(payload.error || 'Vercel APIとの接続に失敗しました。');
+        }
+
+        const displayName = payload.user?.username || payload.user?.email || payload.user?.name || 'connected';
+        elements.accountName.textContent = displayName;
+        renderProjects(payload.projects || []);
+        renderDeployments(payload.deployments || []);
+        setConnection('接続済み', `${displayName} として ${formatDate(payload.fetchedAt)} に取得しました。`);
+      } catch (error) {
+        elements.accountName.textContent = '—';
+        elements.projectCount.textContent = '—';
+        elements.deploymentCount.textContent = '—';
+        renderEmpty(elements.projectsList, 'VERCEL_API_TOKENを設定すると、ここにプロジェクトが表示されます。');
+        renderEmpty(elements.deploymentsList, 'VERCEL_API_TOKENを設定すると、ここに最新デプロイが表示されます。');
+        setConnection('未接続', error.message);
+      } finally {
+        elements.refreshButton.disabled = false;
+      }
+    }
+
+    elements.refreshButton.addEventListener('click', loadVercelData);
+    elements.configForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      loadVercelData();
+    });
+
+    renderEmpty(elements.projectsList, 'まだ取得していません。');
+    renderEmpty(elements.deploymentsList, 'まだ取得していません。');
+  </script>
 </body>
 </html>

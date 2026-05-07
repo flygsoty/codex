@@ -1,0 +1,13 @@
+{
+  "name": "vercel-connect-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A lightweight dashboard that connects to the Vercel REST API from a Vercel Serverless Function.",
+  "scripts": {
+    "start": "npx vercel dev",
+    "check": "node --check api/vercel.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
